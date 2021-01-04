@@ -25,7 +25,5 @@
 
 
 #import "GKBar.h"
-#import "GKBarGraph.h"
 #import "GKLineGraph.h"
-
 #import "UIColor+GraphKit.h"
