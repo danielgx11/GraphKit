@@ -27,8 +27,9 @@
 
 #import <FrameAccessor/FrameAccessor.h>
 #import <MKFoundationKit/NSArray+MK.h>
+#import "NSNumber+K.h"
 
-static CGFloat kDefaultLabelWidth = 40.0;
+static CGFloat kDefaultLabelWidth = 40.0; //default  25
 static CGFloat kDefaultLabelHeight = 12.0;
 static NSInteger kDefaultValueLabelCount = 5;
 
@@ -36,7 +37,7 @@ static CGFloat kDefaultLineWidth = 3.0;
 static CGFloat kDefaultMargin = 10.0;
 static CGFloat kDefaultMarginBottom = 20.0;
 
-static CGFloat kAxisMargin = 50.0;
+static CGFloat kAxisMargin = 35.0; //default  25
 
 @interface GKLineGraph ()
 
@@ -69,7 +70,7 @@ static CGFloat kAxisMargin = 50.0;
     self.lineWidth = kDefaultLineWidth;
     self.margin = kDefaultMargin;
     self.valueLabelCount = kDefaultValueLabelCount;
-    self.clipsToBounds = YES;
+    self.clipsToBounds = NO;
 }
 
 - (void)draw {
@@ -99,10 +100,11 @@ static CGFloat kAxisMargin = 50.0;
     id items = [NSMutableArray arrayWithCapacity:count];
     for (NSInteger idx = 0; idx < count; idx++) {
         
-        CGRect frame = CGRectMake(0, 0, kDefaultLabelWidth, kDefaultLabelHeight);
+        CGRect frame = CGRectMake(0 - 20, 0, kDefaultLabelWidth, kDefaultLabelHeight);
         UILabel *item = [[UILabel alloc] initWithFrame:frame];
+        item.textColor = [UIColor colorWithRed:175.0/255.0 green:175.0/255.0 blue:175.0/255.0 alpha:1.0];
         item.textAlignment = NSTextAlignmentCenter;
-        item.font = [UIFont boldSystemFontOfSize:12];
+        item.font = [UIFont systemFontOfSize:9];
         item.textColor = [UIColor lightGrayColor];
         item.text = [self.dataSource titleForLineAtIndex:idx];
         
@@ -158,20 +160,65 @@ static CGFloat kAxisMargin = 50.0;
         
         CGRect frame = CGRectMake(0, 0, kDefaultLabelWidth, kDefaultLabelHeight);
         UILabel *item = [[UILabel alloc] initWithFrame:frame];
+        item.textColor = [UIColor colorWithRed:175.0/255.0 green:175.0/255.0 blue:175.0/255.0 alpha:1.0];
         item.textAlignment = NSTextAlignmentRight;
-        item.font = [UIFont boldSystemFontOfSize:12];
+        item.font = [UIFont systemFontOfSize:10];
         item.textColor = [UIColor lightGrayColor];
     
         CGFloat value = [self _minValue] + (idx * [self _stepValueLabelY]);
+        if (self.showRoundValue) {
+            value = 10 * round(value/10.0);
+        }
         item.centerY = [self _positionYForLineValue:value];
         
-        item.text = [@(ceil(value)) stringValue];
+//        item.text = [@(ceil(value)) stringValue];
 //        item.text = [@(value) stringValue];
+        [item sizeToFit];
+        
+        if (self.showRawValue) {
+            NSNumberFormatter *numberFormatter = [NSNumberFormatter new];
+            numberFormatter.minimumIntegerDigits = 1;
+            numberFormatter.minimumFractionDigits = 1;
+            numberFormatter.maximumFractionDigits = 1;
+            numberFormatter.decimalSeparator = @",";
+            item.text = [NSString stringWithFormat:@"%@%%", [numberFormatter stringFromNumber:@(value)]];
+            if ([item.text isEqualToString:@",00%"]) {
+                item.text = [NSString stringWithFormat:@"0%@", item.text];
+            }
+        } else {
+            item.text = [@(ceil(value)) abbreviateNumber];
+        }
+        
+        [item sizeToFit];
         
         [items addObject:item];
-        [self addSubview:item];
+        
+        if (idx == 1) {
+       //     [self addSubview:item];
+        }
+        
+        CGRect rightItemframe = CGRectMake(self.frame.size.width - kDefaultLabelWidth, 0, kDefaultLabelWidth, kDefaultLabelHeight);
+        UILabel *rightItem = [[UILabel alloc] initWithFrame:rightItemframe];
+        item.textColor = [UIColor colorWithRed:175.0/255.0 green:175.0/255.0 blue:175.0/255.0 alpha:1.0];
+        rightItem.textAlignment = NSTextAlignmentLeft;
+        rightItem.font = [UIFont systemFontOfSize:10];
+        rightItem.textColor = [UIColor lightGrayColor];
+        rightItem.centerY = [self _positionYForLineValue:value];
+        rightItem.text = item.text;
+        
+        [rightItem sizeToFit];
+        
+        [self addSubview:rightItem];
+        
+        
+        CGFloat valueLineX = item.frame.origin.x + kDefaultLabelWidth + 6;
+        UIView *view = [[UIView alloc] initWithFrame:CGRectMake(valueLineX, item.centerY , self.frame.size.width - valueLineX - kDefaultLabelWidth - 6  , 1)];
+        view.backgroundColor = [UIColor colorWithRed:211.0/255.0 green:211.0/255.0 blue:211.0/255.0 alpha:1.0];
+        [self addSubview:view];
+    
     }
     self.valueLabels = items;
+    
 }
 
 - (CGFloat)_stepValueLabelY {
@@ -207,7 +254,7 @@ static CGFloat kAxisMargin = 50.0;
 }
 
 - (CGFloat)_plotWidth {
-    return (self.width - (2 * self.margin) - kAxisMargin);
+    return (self.width - (2 * self.margin) - kAxisMargin - 27); // default 15
 }
 
 - (CGFloat)_plotHeight {
@@ -298,9 +345,9 @@ static CGFloat kAxisMargin = 50.0;
 }
 
 - (void)reset {
-    self.layer.sublayers = nil;
     [self _removeTitleLabels];
     [self _removeValueLabels];
+    self.layer.sublayers = nil;
 }
 
 @end

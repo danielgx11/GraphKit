@@ -29,6 +29,8 @@
 
 @interface GKLineGraph : UIView
 
+@property (assign, nonatomic) BOOL showRoundValue;
+@property (assign, nonatomic) BOOL showRawValue;
 @property (nonatomic, assign) BOOL animated;
 @property (nonatomic, assign) CFTimeInterval animationDuration;
 
