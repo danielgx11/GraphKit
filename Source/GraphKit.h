@@ -25,8 +25,6 @@
 
 
 #import "GKBar.h"
-
-#import "GKBar.h"
 #import "GKBarGraph.h"
 #import "GKLineGraph.h"
 
