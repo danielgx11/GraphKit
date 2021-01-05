@@ -227,7 +227,11 @@ static CGFloat kAxisMargin = 35.0; //default  25
 
 - (CGFloat)_maxValue {
     id values = [self _allValues];
-    return [[values mk_max] floatValue];
+    if ([self maxValue] == 0) {
+        return [[values mk_max] floatValue];
+    } else {
+        return [[self maxValue] floatValue];
+    }
 }
 
 - (CGFloat)_minValue {
