@@ -117,7 +117,7 @@ static CFTimeInterval kDefaultAnimationDuration = 1.0;
     CGFloat startY = (self.frame.size.height * (1 - (_percentage / 100)));
     CGFloat endY = (self.frame.size.height * (1 - value));
     [path moveToPoint:CGPointMake(startX, startY)];
-	[path addLineToPoint:CGPointMake(startX, endY)];
+    [path addLineToPoint:CGPointMake(startX, endY)];
     return path;
 }
 
